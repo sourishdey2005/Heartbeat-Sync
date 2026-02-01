@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heartbeat Sync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #050102;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+        }
+        h1, h2, .romantic-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .heart-glow {
+            filter: drop-shadow(0 0 20px rgba(255, 77, 109, 0.6));
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            10% { transform: scale(1.15); }
+            20% { transform: scale(1.05); }
+            30% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+        .pulse-animation {
+            animation: pulse var(--pulse-duration) ease-in-out infinite;
+        }
+        .fade-in {
+            animation: fadeIn 2s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@^19.2.4",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+        "react/": "https://esm.sh/react@^19.2.4/"
+      }
+    }
+    </script>
+    <script type="module" src="index.tsx"></script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
