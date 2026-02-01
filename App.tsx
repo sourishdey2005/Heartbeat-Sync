@@ -3,34 +3,38 @@ import { Heart } from './components/Heart';
 import { FloatingHearts } from './components/FloatingHearts';
 import { Typewriter } from './components/Typewriter';
 import { Letter } from './components/Letter';
-import { QUOTES, COLORS, PHASES } from './constants';
+import { CHAPTERS, COLORS } from './constants';
 import { HeartbeatAudio } from './services/AudioService';
 import { AppState } from './types';
 
 const audioService = new HeartbeatAudio();
 
 const App: React.FC = () => {
-  const [state, setState] = useState<AppState>({
+  const [state, setState] = useState<AppState & { activeChapterId: string }>({
     interactionCount: 0,
     isAudioEnabled: false,
     hasStarted: false,
-    currentQuoteIndex: -1,
+    currentQuoteIndex: 0,
     heartRate: 60,
-    isFinished: false
+    isFinished: false,
+    activeChapterId: CHAPTERS[0].id
   });
 
   const [scrollProgress, setScrollProgress] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const interactionTimeoutRef = useRef<number | null>(null);
 
+  // Sync is a combination of how deep they've scrolled and how much they've interacted
   const syncPercentage = Math.min(
-    (state.interactionCount * 0.8) + (scrollProgress * 0.5), 
+    (state.interactionCount * 0.5) + (scrollProgress * 0.7), 
     100
+  );
+
+  const currentChapter = CHAPTERS.reduce((prev, curr) => 
+    syncPercentage >= curr.threshold ? curr : prev
   );
 
   useEffect(() => {
     if (state.isAudioEnabled && state.hasStarted) {
-      // Dynamic audio rate based on sync percentage and interaction
       audioService.setRate(state.heartRate);
     }
   }, [state.heartRate, state.isAudioEnabled, state.hasStarted]);
@@ -38,19 +42,12 @@ const App: React.FC = () => {
   const incrementInteraction = useCallback(() => {
     setState(prev => {
       const newCount = prev.interactionCount + 1;
-      
-      // Every 5 clicks or significant scroll progress advances the narrative
-      const totalNarrativeSteps = QUOTES.length;
-      const progressBasedIndex = Math.floor((syncPercentage / 100) * totalNarrativeSteps);
-      const newQuoteIndex = Math.min(progressBasedIndex, totalNarrativeSteps - 1);
-      
-      const spikedRate = Math.min(prev.heartRate + 3, 140);
+      const spikedRate = Math.min(60 + (syncPercentage * 0.5) + (newCount * 0.2), 160);
       
       return {
         ...prev,
         interactionCount: newCount,
         heartRate: spikedRate,
-        currentQuoteIndex: newQuoteIndex,
         isFinished: syncPercentage >= 100
       };
     });
@@ -59,9 +56,9 @@ const App: React.FC = () => {
     interactionTimeoutRef.current = window.setTimeout(() => {
       setState(prev => ({
         ...prev,
-        heartRate: Math.max(60 + (prev.interactionCount * 0.1), 60)
+        heartRate: Math.max(60 + (syncPercentage * 0.3), 60)
       }));
-    }, 1500);
+    }, 2000);
   }, [syncPercentage]);
 
   const handleStart = () => {
@@ -77,9 +74,10 @@ const App: React.FC = () => {
       interactionCount: 0,
       isAudioEnabled: false,
       hasStarted: false,
-      currentQuoteIndex: -1,
+      currentQuoteIndex: 0,
       heartRate: 60,
-      isFinished: false
+      isFinished: false,
+      activeChapterId: CHAPTERS[0].id
     });
     setScrollProgress(0);
   };
@@ -92,130 +90,136 @@ const App: React.FC = () => {
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = (winScroll / height) * 100;
       setScrollProgress(scrolled);
-      // Light interaction on scroll
-      if (Math.random() > 0.95) incrementInteraction();
-    };
-
-    const onMouseMove = () => {
-       if (Math.random() > 0.995) incrementInteraction();
+      if (Math.random() > 0.98) incrementInteraction();
     };
 
     window.addEventListener('scroll', onScroll);
-    window.addEventListener('mousemove', onMouseMove);
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('mousemove', onMouseMove);
-    };
+    return () => window.removeEventListener('scroll', onScroll);
   }, [state.hasStarted, incrementInteraction]);
 
-  const currentPhase = PHASES.reduce((prev, curr) => 
-    syncPercentage >= curr.threshold ? curr : prev
-  );
-
   return (
-    <div className={`relative min-h-[400vh] w-full selection:bg-pink-500/30`}>
-      {/* Fixed Immersive Layer */}
+    <div className="relative min-h-[600vh] w-full selection:bg-pink-500/30 overflow-x-hidden">
+      {/* Background Layers */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div 
-          className="absolute inset-0 transition-colors duration-1000"
+          className="absolute inset-0 transition-all duration-1000 ease-in-out"
           style={{ 
-            background: `radial-gradient(circle at center, rgba(26, 5, 8, ${0.4 + (syncPercentage/200)}) 0%, #050102 100%)` 
+            background: `radial-gradient(circle at center, ${currentChapter.color} 0%, #050102 100%)` 
           }} 
         />
-        <FloatingHearts intensity={state.heartRate + (syncPercentage / 2)} />
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+        <div className="absolute inset-0 bg-vignette opacity-60" />
+        <FloatingHearts intensity={state.heartRate + (syncPercentage)} />
       </div>
 
-      {/* Main Experience Wrapper */}
+      {/* Start Screen */}
       {!state.hasStarted ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 text-center">
-          <div className="fade-in max-w-lg">
-            <h1 className="dancing text-7xl md:text-9xl mb-8 text-pink-100 tracking-tight drop-shadow-2xl">Heartbeat Sync</h1>
-            <p className="handwriting text-3xl text-pink-300/60 mb-16 italic leading-relaxed">"Scroll, touch, and listen. Let the rhythms align."</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 text-center bg-black/40 backdrop-blur-sm">
+          <div className="fade-in max-w-2xl px-4">
+            <span className="text-[10px] tracking-[0.8em] text-pink-500/60 uppercase mb-4 block">Experimental Interactive Story</span>
+            <h1 className="dancing text-8xl md:text-[10rem] mb-6 text-pink-100 tracking-tighter drop-shadow-[0_0_30px_rgba(255,77,109,0.3)]">Heartbeat Sync</h1>
+            <p className="handwriting text-3xl md:text-4xl text-pink-300/50 mb-16 leading-relaxed italic">"A journey through the frequencies of love."</p>
             <button 
               onClick={handleStart}
-              className="group relative px-16 py-5 rounded-full border border-pink-500/40 text-pink-100 text-2xl handwriting overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95"
+              className="group relative px-20 py-6 rounded-full border border-pink-500/20 text-pink-100 text-2xl handwriting overflow-hidden transition-all duration-700 hover:scale-110 hover:border-pink-500/60 active:scale-95 shadow-2xl"
             >
-              <span className="relative z-10">Sync Your Hearts</span>
-              <div className="absolute inset-0 bg-pink-500/10 group-hover:bg-pink-500/20 transition-colors" />
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-pink-500/50 shadow-[0_0_20px_#ff4d6d]" />
+              <span className="relative z-10 tracking-widest">Connect Souls</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500/0 via-pink-500/10 to-pink-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
             </button>
-            <p className="mt-12 text-[10px] uppercase tracking-[0.5em] text-pink-900/40 animate-pulse">February 2nd • A Shared Frequency</p>
+            <p className="mt-12 text-[10px] uppercase tracking-[0.5em] text-pink-900/60 font-mono">February 2nd • The Resonance of Us</p>
           </div>
         </div>
       ) : (
         <>
-          {/* Centered Interaction Core */}
-          <div className="fixed inset-0 z-20 flex flex-col items-center justify-center pointer-events-none p-6">
-            <div className="pointer-events-auto flex flex-col items-center">
-              <Heart 
-                rate={state.heartRate} 
-                onClick={incrementInteraction}
-                interactionCount={state.interactionCount}
-              />
-              <div className="mt-20 h-48 flex items-center justify-center w-full max-w-2xl px-4 text-center">
-                {state.currentQuoteIndex >= 0 && (
-                  <Typewriter 
-                    key={state.currentQuoteIndex}
-                    text={QUOTES[state.currentQuoteIndex]} 
-                  />
-                )}
+          {/* Persistent Core UI */}
+          <div className="fixed inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+            <div className="pointer-events-auto flex flex-col items-center max-w-4xl w-full px-6">
+              
+              {/* The Heart */}
+              <div className="transition-transform duration-700" style={{ transform: `scale(${0.8 + (syncPercentage/500)})` }}>
+                <Heart 
+                  rate={state.heartRate} 
+                  onClick={incrementInteraction}
+                  interactionCount={state.interactionCount}
+                />
+              </div>
+
+              {/* Advanced Chapter Header */}
+              <div className="mt-12 text-center fade-in transition-opacity duration-700">
+                <h3 className="dancing text-4xl md:text-5xl text-pink-100/90 mb-2 drop-shadow-md">
+                   {currentChapter.title}
+                </h3>
+                <div className="h-0.5 w-12 bg-pink-500/40 mx-auto rounded-full mb-2" />
+                <p className="handwriting text-xl text-pink-500/60 italic">{currentChapter.subtitle}</p>
+              </div>
+              
+              {/* Large Narrative Box */}
+              <div className="mt-12 glass-panel p-8 md:p-12 rounded-2xl w-full text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-pink-500/30 to-transparent" />
+                <Typewriter 
+                  key={currentChapter.id}
+                  text={currentChapter.quote} 
+                  speed={25}
+                />
               </div>
             </div>
           </div>
 
-          {/* Sync Progress Bar */}
-          <div className="fixed top-0 left-0 w-full h-1 z-40 bg-pink-900/20">
-            <div 
-              className="h-full bg-gradient-to-r from-pink-900 via-pink-500 to-white shadow-[0_0_15px_rgba(255,77,109,0.8)] transition-all duration-500 ease-out"
-              style={{ width: `${syncPercentage}%` }}
-            />
+          {/* HUD & Metadata */}
+          <div className="fixed top-0 left-0 w-full h-1.5 z-40">
+             <div className="absolute inset-0 bg-pink-900/10" />
+             <div 
+               className="h-full bg-gradient-to-r from-pink-900 via-pink-500 to-white shadow-[0_0_20px_rgba(255,77,109,1)] transition-all duration-700 ease-out"
+               style={{ width: `${syncPercentage}%` }}
+             />
           </div>
 
-          {/* Side Status Indicators */}
-          <div className="fixed left-8 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-6 font-mono text-[9px] text-pink-500/40 uppercase tracking-[0.3em]">
-            {PHASES.map((p, i) => (
-              <div key={i} className={`flex items-center gap-3 transition-all duration-500 ${syncPercentage >= p.threshold ? 'text-pink-100' : ''}`}>
-                <div className={`w-1.5 h-1.5 rounded-full border border-pink-500/50 ${syncPercentage >= p.threshold ? 'bg-pink-500 shadow-[0_0_8px_#ff4d6d]' : ''}`} />
-                <span>{p.title}</span>
-              </div>
-            ))}
+          {/* Chapter Navigation dots */}
+          <div className="fixed right-8 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-8">
+            {CHAPTERS.map((chapter, i) => {
+              const isActive = currentChapter.id === chapter.id;
+              const isPast = syncPercentage >= chapter.threshold;
+              return (
+                <div key={chapter.id} className="relative group flex items-center justify-end">
+                   <span className={`absolute right-10 text-[10px] uppercase tracking-[0.3em] font-mono transition-all duration-500 ${isActive ? 'opacity-100 translate-x-0 text-pink-300' : 'opacity-0 translate-x-4 text-pink-500/20'}`}>
+                      {chapter.title}
+                   </span>
+                   <div className={`w-3 h-3 rounded-full border border-pink-500/40 transition-all duration-500 ${isPast ? 'bg-pink-500 scale-125' : 'bg-transparent scale-100'} ${isActive ? 'shadow-[0_0_15px_#ff4d6d]' : ''}`} />
+                </div>
+              );
+            })}
           </div>
 
-          {/* Bottom HUD */}
-          <div className="fixed bottom-10 left-10 right-10 z-30 flex justify-between items-end pointer-events-none">
-            <div className="space-y-1">
-              <h3 className="dancing text-3xl text-pink-200/80">{currentPhase.title}</h3>
-              <p className="handwriting text-lg text-pink-500/60">{currentPhase.subtitle}</p>
-            </div>
-            
-            <div className="flex flex-col items-end gap-2 font-mono text-[10px] text-pink-500/40 tracking-widest uppercase">
-              <div className="flex items-center gap-3">
-                 <span>SYNC SCORE</span>
-                 <span className="text-pink-100 text-lg">{Math.round(syncPercentage)}%</span>
-              </div>
-              <p>BPM: {Math.round(state.heartRate)}</p>
-              <button 
+          {/* Audio & Stats Control */}
+          <div className="fixed bottom-10 left-10 z-30 space-y-4">
+             <div className="font-mono text-[9px] text-pink-500/40 tracking-[0.4em] uppercase">
+                <p>BIOMETRIC SYNC: {Math.round(syncPercentage)}%</p>
+                <p>PULSE FREQ: {Math.round(state.heartRate)} BPM</p>
+                <p>STATUS: {syncPercentage >= 100 ? 'ALIGNED' : 'CALIBRATING...'}</p>
+             </div>
+             <button 
                 onClick={() => {
                    const next = !state.isAudioEnabled;
                    setState(p => ({ ...p, isAudioEnabled: next }));
                    if (next) audioService.start(); else audioService.stop();
                 }}
-                className="pointer-events-auto mt-4 p-3 rounded-full border border-pink-500/20 hover:bg-pink-500/10 transition-colors"
+                className="pointer-events-auto p-4 glass-panel rounded-full hover:bg-white/10 transition-all group"
               >
-                {state.isAudioEnabled ? 'SOUND ON' : 'MUTED'}
+                {state.isAudioEnabled ? (
+                  <svg className="w-5 h-5 text-pink-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                ) : (
+                  <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4.27 3L3 4.27l9 9v.28c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4v-1.73L19.73 21 21 19.73 4.27 3zM14 7h4V3h-6v5.18l2 2V7z"/></svg>
+                )}
               </button>
-            </div>
           </div>
 
-          {/* Letter Overlay */}
+          {/* Letter Reveal Overlay */}
           {state.isFinished && <Letter onClose={handleReset} />}
 
-          {/* Scroll Visual Indicator */}
-          {!state.isFinished && syncPercentage < 90 && (
-            <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-40 animate-bounce pointer-events-none">
-              <span className="text-[10px] tracking-[0.4em] uppercase text-pink-300">Scroll to deep sync</span>
-              <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+          {/* Scroll Down Cue */}
+          {!state.isFinished && (
+            <div className="fixed bottom-12 right-12 z-20 flex flex-col items-center gap-4 opacity-30 animate-pulse pointer-events-none">
+              <span className="text-[10px] tracking-[0.6em] uppercase text-pink-300 transform -rotate-90 origin-right translate-y-12">Deepen the Resonance</span>
+              <div className="w-px h-16 bg-gradient-to-b from-pink-500 to-transparent" />
             </div>
           )}
         </>

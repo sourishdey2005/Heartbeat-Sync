@@ -1,30 +1,52 @@
-export const QUOTES = [
-  "In the quiet moments, I find myself thinking of you.",
-  "It's the way you look at the world that makes me look at you.",
-  "Some hearts just beat differently when they're near each other.",
-  "I never knew a single soul could feel like an entire universe.",
-  "You're the melody I can't stop humming in my mind.",
-  "If every star was a reason why I love you, the sky wouldn't be big enough.",
-  "This isn't a temporary spark; it's a slow, beautiful burn.",
-  "I've searched for the right words, but only your name fits.",
-  "You make the ordinary feel like a miracle.",
-  "My heart knew it was you long before my mind could admit it."
-];
-
-export const PHASES = [
-  { threshold: 0, title: "The Silence", subtitle: "Where it all begins..." },
-  { threshold: 25, title: "The Awareness", subtitle: "A gentle stirring in the dark." },
-  { threshold: 50, title: "The Connection", subtitle: "Rhythms beginning to align." },
-  { threshold: 75, title: "The Sync", subtitle: "Two souls, one heartbeat." },
-  { threshold: 100, title: "The Truth", subtitle: "A message from the heart." }
+export const CHAPTERS = [
+  {
+    id: "echo",
+    threshold: 0,
+    title: "The Echo",
+    subtitle: "A distant frequency searching for a home.",
+    quote: "In the vast silence of the everyday, I heard a rhythm that sounded familiar. It wasn't a loud sound, but a persistent one—a soft echo of a feeling I hadn't yet named. I started looking for the source, not knowing I was looking for you.",
+    color: "rgba(255, 77, 109, 0.1)"
+  },
+  {
+    id: "resonance",
+    threshold: 20,
+    title: "The Resonance",
+    subtitle: "When vibrations begin to hum in harmony.",
+    quote: "Then came the resonance. The way you spoke, the way you laughed—it aligned with the spaces between my own thoughts. Suddenly, the world felt less like a collection of random noises and more like a composition. We were starting to vibrate at the same frequency.",
+    color: "rgba(255, 77, 109, 0.25)"
+  },
+  {
+    id: "entanglement",
+    threshold: 45,
+    title: "The Entanglement",
+    subtitle: "Threads of fate weaving into a single tapestry.",
+    quote: "It's no longer just a sound; it's a pull. An invisible thread that draws my attention to you even when you aren't in the room. Every interaction adds another strand to the weave. We are becoming entangled in the most beautiful way possible—one heartbeat at a time.",
+    color: "rgba(255, 77, 109, 0.4)"
+  },
+  {
+    id: "singularity",
+    threshold: 70,
+    title: "The Singularity",
+    subtitle: "Where two separate lives become one rhythm.",
+    quote: "There is a point where the 'you' and the 'me' fade into a 'we.' It's the moment the pulse becomes indistinguishable. I can no longer tell where my joy ends and yours begins. This is the singularity—the place where love is the only gravity that matters.",
+    color: "rgba(255, 77, 109, 0.6)"
+  },
+  {
+    id: "eternal",
+    threshold: 95,
+    title: "The Eternal",
+    subtitle: "A frequency that will never truly fade.",
+    quote: "This isn't just for today. This rhythm is etched into the very core of who I am. Whether we are side by side or worlds apart, the sync remains. You are my forever frequency, my constant pulse, and the reason my heart knows how to sing.",
+    color: "rgba(255, 77, 109, 0.8)"
+  }
 ];
 
 export const LETTER_CONTENT = {
-  greeting: "To the one who changed it all,",
-  body: "I spent so much time looking for meaning in the grand gestures, forgetting that the most profound beauty is often found in the simplest sync. The way your laughter sounds, the way you listen when I have no words, and the way the world feels just a little bit brighter when you're in it.\n\nThis isn't just about a day on the calendar. It's about every heartbeat we've shared, every glance that lingered, and the quiet realization that my life is richer because of you. You are my favorite person, my safest place, and my greatest adventure.\n\nThank you for being you. Thank you for beating in sync with me.",
-  closing: "With all that I am,",
-  signature: "Yours Always",
-  date: "Feb 2 — Share Love Day"
+  greeting: "My Dearest Soul,",
+  body: "I spent so much of my life believing that love was a grand performance, something meant for the stage and the spotlight. I was wrong. \n\nI’ve learned that the most profound love is found in the quiet sync of two people simply existing in the same space. It’s in the way you know my coffee order, the way you look at me when you think I’m not watching, and the steady, unwavering rhythm of your presence in my life.\n\nYou are my safe harbor in a chaotic sea. You are the light that filters through the trees on a long afternoon. More than anything, you are the person I want to share every heartbeat with, today and for all the Februaries yet to come.\n\nThank you for being the other half of this sync.",
+  closing: "Eternally and always,",
+  signature: "The One Who Beats for You",
+  date: "February 2nd, 2025"
 };
 
 export const COLORS = {
@@ -32,7 +54,7 @@ export const COLORS = {
   secondary: '#ff758f',
   accent: '#c9184a',
   background: '#050102',
-  glow: 'rgba(255, 77, 109, 0.4)'
+  glow: 'rgba(255, 77, 109, 0.6)'
 };
 
-export const HEART_SIZE = 320;
+export const HEART_SIZE = 340;

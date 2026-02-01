@@ -6,7 +6,7 @@ interface TypewriterProps {
   onComplete?: () => void;
 }
 
-export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 40, onComplete }) => {
+export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 30, onComplete }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [index, setIndex] = useState(0);
 
@@ -28,9 +28,11 @@ export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 40, onComp
   }, [index, text, speed, onComplete]);
 
   return (
-    <div className="handwriting text-3xl md:text-4xl text-center leading-relaxed text-pink-100 px-6 max-w-2xl mx-auto min-h-[4rem]">
-      {displayedText}
-      <span className="animate-pulse ml-1 opacity-70 text-pink-400">|</span>
+    <div className="handwriting text-2xl md:text-3xl lg:text-4xl text-center leading-[1.8] text-pink-50/90 px-2 min-h-[12rem] md:min-h-[10rem] flex items-center justify-center italic font-light tracking-wide">
+      <p className="max-w-3xl drop-shadow-sm">
+        {displayedText}
+        <span className="animate-pulse ml-1 opacity-60 text-pink-400">|</span>
+      </p>
     </div>
   );
 };
