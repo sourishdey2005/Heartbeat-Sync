@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heartbeat Sync — A Love Letter</title>
+    <title>Heartbeat Sync — A Love Story</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff758f;
+            --dark: #050102;
+        }
         body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            background-color: #050102;
+            background-color: var(--dark);
             font-family: 'Inter', sans-serif;
             color: #fff;
+            overflow-x: hidden;
         }
         h1, h2, .serif-font {
             font-family: 'Playfair Display', serif;
@@ -29,9 +34,9 @@
         }
         @keyframes pulse {
             0% { transform: scale(1); }
-            10% { transform: scale(1.15); }
-            20% { transform: scale(1.05); }
-            30% { transform: scale(1.25); }
+            10% { transform: scale(1.1); }
+            20% { transform: scale(1.02); }
+            30% { transform: scale(1.15); }
             100% { transform: scale(1); }
         }
         .pulse-animation {
@@ -44,21 +49,31 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .slide-up {
-            animation: slideUp 1s ease-out forwards;
-        }
         .letter-paper {
             background: linear-gradient(135deg, #fff9f0 0%, #fef3e2 100%);
-            box-shadow: 0 10px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.05);
-            border-radius: 2px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.05);
+            border-radius: 4px;
             color: #433;
         }
+        .section-transition {
+            transition: opacity 1s ease-in-out, transform 1s ease-out;
+        }
+        .mask-gradient {
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+        }
+        /* Custom thin scrollbar */
         ::-webkit-scrollbar {
-            display: none;
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 77, 109, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 77, 109, 0.5);
         }
     </style>
     <script type="importmap">
