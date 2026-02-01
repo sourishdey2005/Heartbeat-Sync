@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface TypewriterProps {
@@ -7,7 +6,7 @@ interface TypewriterProps {
   onComplete?: () => void;
 }
 
-export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 60, onComplete }) => {
+export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 40, onComplete }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [index, setIndex] = useState(0);
 
@@ -29,9 +28,9 @@ export const Typewriter: React.FC<TypewriterProps> = ({ text, speed = 60, onComp
   }, [index, text, speed, onComplete]);
 
   return (
-    <div className="romantic-font text-2xl md:text-3xl text-center leading-relaxed italic text-pink-100 px-6">
+    <div className="handwriting text-3xl md:text-4xl text-center leading-relaxed text-pink-100 px-6 max-w-2xl mx-auto min-h-[4rem]">
       {displayedText}
-      <span className="animate-pulse ml-1 opacity-70">|</span>
+      <span className="animate-pulse ml-1 opacity-70 text-pink-400">|</span>
     </div>
   );
 };
